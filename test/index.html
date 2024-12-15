@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rock Paper Scissors</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="game.css">
+    
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="game-title" >Stone Paper Scissor</h1>
+        <br>
+        
+        <div class="score-board">
+            <!-- <section id="PLAYER1"></section> -->
+            <div class="score-section">
+                <h2>Player</h2>
+                <div id="player-score" class="score">0</div>
+            </div>
+        <!-- </section> -->
+        <!-- <section id="PLAYER2"> -->
+            <div class="score-section">
+                <h2>Computer</h2>
+                <div id="computer-score" class="score">0</div>
+            </div>
+        <!-- </section> -->
+        </div>
+
+        <div id="result"></div>
+
+        <div class="choices">
+            <div class="choice" data-choice="rock">✊</div>
+            <div class="choice" data-choice="paper">✋</div>
+            <div class="choice" data-choice="scissors">✌️</div>
+        </div>
+
+        <div class="round-buttons">
+            <button class="round-btn" data-rounds="3">3 Rounds</button>
+            <button class="round-btn" data-rounds="5">5 Rounds</button>
+            <button class="round-btn" data-rounds="10">10 Rounds</button>
+            <button class="round-btn" data-rounds="15">15 Rounds</button>
+        </div>
+
+        <button id="reset-button" class="reset-btn">Reset Game</button>
+    </div>
+    
+
+    <script>
+        const choices = document.querySelectorAll('.choice');
+        const resultDisplay = document.getElementById('result');
+        const playerScoreDisplay = document.getElementById('player-score');
+        const computerScoreDisplay = document.getElementById('computer-score');
+        const resetButton = document.getElementById('reset-button');
+        const roundButtons = document.querySelectorAll('.round-btn');
+
+        let playerScore = 0;
+        let computerScore = 0;
+        let roundsToPlay = 0;
+        let roundsPlayed = 0;
+
+        roundButtons.forEach(button => {
+            button.addEventListener('click', selectRounds);
+        });
+
+        resetButton.addEventListener('click', resetGame);
+        choices.forEach(choice => {
+            choice.addEventListener('click', playGame);
+        });
+
+        function selectRounds(e) {
+            roundsToPlay = parseInt(e.target.dataset.rounds);
+            roundsPlayed = 0;
+            playerScore = 0;
+            computerScore = 0;
+            playerScoreDisplay.textContent = playerScore;
+            computerScoreDisplay.textContent = computerScore;
+            resultDisplay.textContent = '';
+            resultDisplay.classList.remove('animate-win', 'animate-lose');
+            // Enable the choices and hide the round selection
+            document.querySelector('.round-buttons').style.display = 'none';
+        }
+
+        function playGame(e) {
+            if (roundsPlayed >= roundsToPlay) return; // Stop if the rounds are over
+
+            const playerChoice = e.target.dataset.choice;
+            const computerChoice = getComputerChoice();
+            const result = determineWinner(playerChoice, computerChoice);
+
+            displayResult(result, playerChoice, computerChoice);
+            updateScore(result);
+            roundsPlayed++;
+
+            if (roundsPlayed === roundsToPlay) {
+                endGame();
+            }
+        }
+
+        function getComputerChoice() {
+            const choices = ['rock', 'paper', 'scissors'];
+            const randomIndex = Math.floor(Math.random() * 3);
+            return choices[randomIndex];
+        }
+
+        function determineWinner(player, computer) {
+            if (player === computer) return 'draw';
+            
+            const winConditions = {
+                rock: 'scissors',
+                paper: 'rock',
+                scissors: 'paper'
+            };
+
+            return winConditions[player] === computer ? 'player' : 'computer';
+        }
+
+        function displayResult(result, playerChoice, computerChoice) {
+            const emojis = {
+                rock: '✊',
+                paper: '✋',
+                scissors: '✌️'
+            };
+
+            let message = `Player: ${emojis[playerChoice]} vs Computer: ${emojis[computerChoice]} - `;
+
+            switch(result) {
+                case 'player':
+                    message += 'You Win! 🎉';
+                    resultDisplay.classList.add('animate-win');
+                    resultDisplay.classList.remove('animate-lose');
+                    break;
+                case 'computer':
+                    message += 'Computer Wins! 😞';
+                    resultDisplay.classList.add('animate-lose');
+                    resultDisplay.classList.remove('animate-win');
+                    break;
+                case 'draw':
+                    message += 'It\'s a Draw! 🤝';
+                    resultDisplay.classList.remove('animate-win', 'animate-lose');
+                    break;
+            }
+
+            resultDisplay.textContent = message;
+        }
+
+        function updateScore(result) {
+            if (result === 'player') {
+                playerScore++;
+                playerScoreDisplay.textContent = playerScore;
+            } else if (result === 'computer') {
+                computerScore++;
+                computerScoreDisplay.textContent = computerScore;
+            }
+        }
+
+        function endGame() {
+            if (playerScore > computerScore) {
+                resultDisplay.textContent = 'You won the game! 🎉';
+                resultDisplay.classList.add('animate-win');
+            } else if (playerScore < computerScore) {
+                resultDisplay.textContent = 'You lost the game! 😞';
+                resultDisplay.classList.add('animate-lose');
+            } else {
+                resultDisplay.textContent = 'It\'s a draw! 🤝';
+            }
+
+            // Show reset button and enable round selection
+            document.querySelector('.round-buttons').style.display = 'block';
+        }
+
+        function resetGame() {
+            playerScore = 0;
+            computerScore = 0;
+            roundsPlayed = 0;
+            roundsToPlay = 0;
+            playerScoreDisplay.textContent = '0';
+            computerScoreDisplay.textContent = '0';
+            resultDisplay.textContent = '';
+            resultDisplay.classList.remove('animate-win', 'animate-lose');
+            document.querySelector('.round-buttons').style.display = 'block';
+        }
+    </script>
+    
+</body>
+</html>
